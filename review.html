@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Product Review Form</title>
+<style>
+  
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #CDB4DB;
+    }
+    form {
+        background-color: #FFC8DD;
+        font-family:"Tahoma";
+        font-weight: 400;
+        font-style: normal;
+        max-width: 500px;
+        margin: 0 auto;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    input{
+        background-color: #FFAFCC;
+    }
+    fieldset {
+        border: none;
+        margin-bottom: 20px;
+    }
+    legend {
+        font-size: 24px;
+        margin-bottom: 10px;
+    }
+    label {
+        display: block;
+        margin-bottom: 8px;
+    }
+    input[type="text"],
+    input[type="email"],
+    textarea {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+    input[type="radio"],
+    input[type="checkbox"] {
+        margin-right: 5px;
+    }
+    .error-message {
+        color: red;
+        font-size: 14px;
+        margin-top: -10px;
+        margin-bottom: 10px;
+    }
+    .submit-btn {
+        background-color: #A2D2FF;
+        color: rgb(12, 12, 12);
+        padding: 12px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        width: 100%;
+        font-size: 16px;
+    }
+    .submit-btn:hover {
+        background-color: #BDE0FE;
+    }
+    #productImageContainer {
+        display: none;
+    }
+    #review{
+        background-color: #FFAFCC;
+    }
+    #ageGroup{
+        background-color:#BDE0FE;
+    }
+</style>
+</head>
+<body>
+<form id="reviewForm" onsubmit="return validateForm()">
+    <fieldset>
+        <legend>Product Review</legend>
+        <label for="productID">Product ID:</label>
+        <input type="text" id="productID" name="productID" required>
+
+        <label for="datePurchased">Date Purchased:</label>
+        <input type="date" id="datePurchased" name="datePurchased" required>
+
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name">
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email">
+
+        <label for="location">Location:</label>
+        <input type="text" id="location" name="location">
+
+        <label for="ageGroup">Age Group:</label>
+        <select id="ageGroup" name="ageGroup">
+            <option value="">Select Age Group</option>
+            <option value="under18">Under 18</option>
+            <option value="18-30">18 - 30</option>
+            <option value="30-45">30 - 45</option>
+            <option value="over45">Over 45</option>
+        </select>
+
+        <label for="rating">Rating:</label><br>
+        <input type="radio" id="star1" name="rating" value="1" onclick="toggleFileUpload()">
+        <label for="star1">1 star</label>
+        <input type="radio" id="star2" name="rating" value="2" onclick="toggleFileUpload()">
+        <label for="star2">2 stars</label>
+        <input type="radio" id="star3" name="rating" value="3" onclick="toggleFileUpload()">
+        <label for="star3">3 stars</label>
+        <input type="radio" id="star4" name="rating" value="4" onclick="toggleFileUpload()">
+        <label for="star4">4 stars</label>
+        <input type="radio" id="star5" name="rating" value="5" onclick="toggleFileUpload()">
+        <label for="star5">5 stars</label>
+
+        <div id="productImageContainer">
+            <label for="productImage">Product Image (if rating <= 1):</label>
+            <input type="file" id="productImage" name="productImage">
+        </div>
+
+        <label for="review">Review:</label>
+        <textarea id="review" name="review" rows="4" required></textarea>
+
+        <div class="error-message" id="errorMessage"></div>
+        
+        <button type="submit" class="submit-btn">Submit Review</button>
+    </fieldset>
+</form>
+
+<script>
+    function toggleFileUpload() {
+        var productRating = document.querySelector('input[name="rating"]:checked');
+        var productImageContainer = document.getElementById('productImageContainer');
+        if (productRating && parseInt(productRating.value) <= 1) {
+            productImageContainer.style.display = 'block';
+        } else {
+            productImageContainer.style.display = 'none';
+        }
+    }
+
+    function validateForm() {
+        var productRating = document.querySelector('input[name="rating"]:checked');
+        var productImage = document.getElementById('productImage');
+        var datePurchased = new Date(document.getElementById('datePurchased').value);
+        var currentDate = new Date();
+        var errorMessage = document.getElementById('errorMessage');
+
+        // Validate rating
+        if (!productRating) {
+            errorMessage.textContent = "Please select a rating!";
+            return false;
+        }
+        
+        if (productRating.value <= 1 && !productImage.files.length) {
+            errorMessage.textContent = "Please upload the image";
+            return false;
+        }
+
+        // Check date validity
+        var timeDiff = Math.abs(currentDate.getTime() - datePurchased.getTime());
+        var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+        if (diffDays > 14) {
+            alert("It's been more than 2 weeks since you purchased the product. Consider escalating if needed.");
+        }
+
+        // Check image size and type
+        if (productImage.files.length && (productImage.files[0].size > 1024 * 1024 || !['image/jpeg', 'image/png', 'image/gif'].includes(productImage.files[0].type))) {
+            errorMessage.textContent = "Image must be less than 1MB and of type JPEG, PNG, or GIF.";
+            return false;
+        }
+
+        // Clear error message if no errors
+        errorMessage.textContent = "";
+
+        return true;
+    }
+</script>
+</body>
+</html>
